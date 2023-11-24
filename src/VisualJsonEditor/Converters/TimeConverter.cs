@@ -17,7 +17,9 @@ namespace VisualJsonEditor.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
+            {
                 return null;
+            }
 
             return value is TimeSpan ?
                 DateTime.MinValue + (TimeSpan)value :
@@ -27,7 +29,9 @@ namespace VisualJsonEditor.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is DateTime)
+            {
                 return ((DateTime)value).TimeOfDay;
+            }
 
             return value;
         }

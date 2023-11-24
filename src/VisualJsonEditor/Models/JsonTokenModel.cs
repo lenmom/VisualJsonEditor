@@ -7,9 +7,12 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.ObjectModel;
+
 using MyToolkit.Collections;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using NJsonSchema;
 
 namespace VisualJsonEditor.Models
@@ -27,7 +30,7 @@ namespace VisualJsonEditor.Models
         /// <returns>The JSON string. </returns>
         public string ToJson()
         {
-            var token = ToJToken();
+            JToken token = ToJToken();
             return JsonConvert.SerializeObject(token, Formatting.Indented);
         }
 

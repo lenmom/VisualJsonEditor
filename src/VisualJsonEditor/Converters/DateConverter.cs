@@ -17,7 +17,9 @@ namespace VisualJsonEditor.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
+            {
                 return null;
+            }
 
             return value is DateTime ? value : DateTime.Parse(value.ToString());
         }

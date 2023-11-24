@@ -1,14 +1,15 @@
-﻿﻿//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="ApplicationConfiguration.cs" company="Visual JSON Editor">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>http://visualjsoneditor.codeplex.com/license</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
- 
+
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+
 using Newtonsoft.Json;
 
 namespace VisualJsonEditor
@@ -19,7 +20,7 @@ namespace VisualJsonEditor
         public ApplicationConfiguration()
         {
             IsFirstStart = true;
-            
+
             WindowHeight = 600;
             WindowWidth = 700;
             WindowState = WindowState.Normal;
@@ -41,6 +42,6 @@ namespace VisualJsonEditor
         public string FilePath { get; set; }
 
         [JsonIgnore]
-        public string FileName { get { return Path.GetFileName(FilePath); } }
+        public string FileName => Path.GetFileName(FilePath);
     }
 }

@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
+
 using NJsonSchema;
 
 namespace VisualJsonEditor.Models
@@ -36,10 +37,10 @@ namespace VisualJsonEditor.Models
         /// <summary>Gets or sets the value. </summary>
         public object Value
         {
-            get { return ContainsKey("Value") ? this["Value"] : null; }
-            set { this["Value"] = value; }
+            get => ContainsKey("Value") ? this["Value"] : null;
+            set => this["Value"] = value;
         }
-        
+
         /// <summary>Converts the <see cref="JsonTokenModel"/> to a <see cref="JToken"/>. </summary>
         /// <returns>The <see cref="JToken"/>. </returns>
         public override JToken ToJToken()

@@ -8,6 +8,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+
 using MyToolkit.Utilities;
 
 namespace VisualJsonEditor.Controls
@@ -21,33 +22,33 @@ namespace VisualJsonEditor.Controls
         }
 
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
-            "Header", typeof (object), typeof (ExpandingGroupBox), new PropertyMetadata(default(object)));
+            "Header", typeof(object), typeof(ExpandingGroupBox), new PropertyMetadata(default(object)));
 
         /// <summary>Gets or sets the header object (data context of header template). </summary>
         public object Header
         {
-            get { return (object) GetValue(HeaderProperty); }
-            set { SetValue(HeaderProperty, value); }
+            get => GetValue(HeaderProperty);
+            set => SetValue(HeaderProperty, value);
         }
 
         public static readonly DependencyProperty HeaderTemplateProperty = DependencyProperty.Register(
-            "HeaderTemplate", typeof (DataTemplate), typeof (ExpandingGroupBox), new PropertyMetadata(default(DataTemplate)));
+            "HeaderTemplate", typeof(DataTemplate), typeof(ExpandingGroupBox), new PropertyMetadata(default(DataTemplate)));
 
         /// <summary>Gets or sets the header template (always visible). </summary>
         public DataTemplate HeaderTemplate
         {
-            get { return (DataTemplate) GetValue(HeaderTemplateProperty); }
-            set { SetValue(HeaderTemplateProperty, value); }
+            get => (DataTemplate)GetValue(HeaderTemplateProperty);
+            set => SetValue(HeaderTemplateProperty, value);
         }
 
         public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register(
-            "IsExpanded", typeof (bool), typeof (ExpandingGroupBox), new PropertyMetadata(true));
+            "IsExpanded", typeof(bool), typeof(ExpandingGroupBox), new PropertyMetadata(true));
 
         /// <summary>Gets or sets a value indicating whether the group box is expanded. </summary>
         public bool IsExpanded
         {
-            get { return (bool) GetValue(IsExpandedProperty); }
-            set { SetValue(IsExpandedProperty, value); }
+            get => (bool)GetValue(IsExpandedProperty);
+            set => SetValue(IsExpandedProperty, value);
         }
 
         /// <summary>When overridden in a derived class, is invoked whenever application code or internal 
@@ -58,7 +59,7 @@ namespace VisualJsonEditor.Controls
 
             Loaded += delegate
             {
-                var button = this.FindVisualChild<Button>();
+                Button button = this.FindVisualChild<Button>();
                 button.Click += OnToggleExpanded;
             };
         }
@@ -66,7 +67,7 @@ namespace VisualJsonEditor.Controls
         private void OnToggleExpanded(object sender, RoutedEventArgs args)
         {
             IsExpanded = !IsExpanded;
-            args.Handled = true; 
+            args.Handled = true;
         }
     }
 }

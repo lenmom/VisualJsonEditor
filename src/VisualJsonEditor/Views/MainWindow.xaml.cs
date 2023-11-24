@@ -11,13 +11,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+
 using Fluent;
+
 using MyToolkit.Mvvm;
 using MyToolkit.UI;
 using MyToolkit.Utilities;
+
 using VisualJsonEditor.Models;
 using VisualJsonEditor.Utilities;
 using VisualJsonEditor.ViewModels;
+
 using Xceed.Wpf.AvalonDock;
 
 namespace VisualJsonEditor.Views
@@ -42,23 +46,22 @@ namespace VisualJsonEditor.Views
 
 #if DEBUG
             if (Debugger.IsAttached)
+            {
                 Dispatcher.InvokeAsync(delegate { Model.OpenDocumentAsync(@"Samples/Sample.json"); });
+            }
 #endif
 
         }
 
         /// <summary>Gets the view model. </summary>
-        public MainWindowModel Model { get { return (MainWindowModel)Resources["ViewModel"]; } }
+        public MainWindowModel Model => (MainWindowModel)Resources["ViewModel"];
 
         /// <summary>Gets the configuration file name. </summary>
-        public string ConfigurationFileName
-        {
-            get { return "VisualJsonEditor/Config"; }
-        }
+        public string ConfigurationFileName => "VisualJsonEditor/Config";
 
         private void RegisterFileOpenHandler()
         {
-            var fileHandler = new FileOpenHandler();
+            FileOpenHandler fileHandler = new FileOpenHandler();
             fileHandler.FileOpen += (sender, args) => { Model.OpenDocumentAsync(args.FileName); };
             fileHandler.Initialize(this);
         }
@@ -112,7 +115,7 @@ namespace VisualJsonEditor.Views
 
         private async void CheckForApplicationUpdate()
         {
-            var updater = new ApplicationUpdater("VisualJsonEditor.msi", GetType().Assembly, 
+            ApplicationUpdater updater = new ApplicationUpdater("VisualJsonEditor.msi", GetType().Assembly,
                 "http://rsuter.com/Projects/VisualJsonEditor/updates.php");
             await updater.CheckForUpdate(this);
         }
@@ -127,11 +130,13 @@ namespace VisualJsonEditor.Views
         {
             args.Cancel = true;
 
-            foreach (var document in Model.Documents.ToArray())
+            foreach (JsonDocumentModel document in Model.Documents.ToArray())
             {
-                var result = await Model.CloseDocumentAsync(document);
+                bool result = await Model.CloseDocumentAsync(document);
                 if (!result)
+                {
                     return;
+                }
             }
 
             Closing -= OnWindowClosing;
@@ -141,8 +146,10 @@ namespace VisualJsonEditor.Views
 
         private void OnShowAboutWindow(object sender, RoutedEventArgs e)
         {
-            var dlg = new AboutWindow();
-            dlg.Owner = this;
+            AboutWindow dlg = new AboutWindow
+            {
+                Owner = this
+            };
             dlg.ShowDialog();
         }
 
@@ -162,7 +169,9 @@ namespace VisualJsonEditor.Views
             foreach (QuickAccessMenuItem menuItem in Ribbon.QuickAccessItems)
             {
                 if (!Ribbon.IsInQuickAccessToolBar(menuItem))
+                {
                     Ribbon.AddToQuickAccessToolBar(menuItem);
+                }
             }
         }
     }

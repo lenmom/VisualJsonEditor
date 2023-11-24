@@ -7,10 +7,11 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+
 using NJsonSchema;
+
 using VisualJsonEditor.Models;
 
 namespace VisualJsonEditor.Controls
@@ -30,8 +31,8 @@ namespace VisualJsonEditor.Controls
         /// <summary>Gets or sets the <see cref="JsonObjectModel"/> to edit with the editor. </summary>
         public object Data
         {
-            get { return GetValue(DataProperty); }
-            set { SetValue(DataProperty, value); }
+            get => GetValue(DataProperty);
+            set => SetValue(DataProperty, value);
         }
 
         private void Update()
@@ -41,15 +42,17 @@ namespace VisualJsonEditor.Controls
 
         private void OnAddArrayObject(object sender, RoutedEventArgs e)
         {
-            var property = (JsonPropertyModel)((Button)sender).Tag;
+            JsonPropertyModel property = (JsonPropertyModel)((Button)sender).Tag;
 
             if (property.Value == null)
+            {
                 property.Value = new ObservableCollection<JsonTokenModel>();
+            }
 
-            var list = (ObservableCollection<JsonTokenModel>)property.Value;
-            var schema = property.Schema.ActualSchema.Item.ActualSchema;
+            ObservableCollection<JsonTokenModel> list = (ObservableCollection<JsonTokenModel>)property.Value;
+            JsonSchema schema = property.Schema.ActualSchema.Item.ActualSchema;
 
-            var obj = !schema.Type.HasFlag(JsonObjectType.Object) && !schema.Type.HasFlag(JsonObjectType.Array) ? 
+            JsonTokenModel obj = !schema.Type.HasFlag(JsonObjectType.Object) && !schema.Type.HasFlag(JsonObjectType.Array) ?
                 (JsonTokenModel)new JsonValueModel { Schema = schema } : JsonObjectModel.FromSchema(schema);
             obj.ParentList = list;
 
@@ -58,13 +61,13 @@ namespace VisualJsonEditor.Controls
 
         private void OnRemoveArrayObject(object sender, RoutedEventArgs e)
         {
-            var obj = (JsonTokenModel)((Button)sender).Tag;
+            JsonTokenModel obj = (JsonTokenModel)((Button)sender).Tag;
             obj.ParentList.Remove(obj);
         }
 
         private void OnCreateObject(object sender, RoutedEventArgs e)
         {
-            var property = (JsonPropertyModel)((CheckBox)sender).Tag;
+            JsonPropertyModel property = (JsonPropertyModel)((CheckBox)sender).Tag;
             if (property.Parent[property.Name] == null)
             {
                 property.Parent[property.Name] = JsonObjectModel.FromSchema(property.Schema.ActualSchema);
@@ -74,7 +77,7 @@ namespace VisualJsonEditor.Controls
 
         private void OnRemoveObject(object sender, RoutedEventArgs e)
         {
-            var property = (JsonPropertyModel)((CheckBox)sender).Tag;
+            JsonPropertyModel property = (JsonPropertyModel)((CheckBox)sender).Tag;
             if (property.Parent.ContainsKey(property.Name) && property.Parent[property.Name] != null)
             {
                 property.Parent[property.Name] = null;
@@ -84,7 +87,7 @@ namespace VisualJsonEditor.Controls
 
         private void OnCreateArray(object sender, RoutedEventArgs e)
         {
-            var property = (JsonPropertyModel)((CheckBox)sender).Tag;
+            JsonPropertyModel property = (JsonPropertyModel)((CheckBox)sender).Tag;
             if (property.Parent[property.Name] == null)
             {
                 property.Parent[property.Name] = new ObservableCollection<JsonTokenModel>();
@@ -94,7 +97,7 @@ namespace VisualJsonEditor.Controls
 
         private void OnRemoveArray(object sender, RoutedEventArgs e)
         {
-            var property = (JsonPropertyModel)((CheckBox)sender).Tag;
+            JsonPropertyModel property = (JsonPropertyModel)((CheckBox)sender).Tag;
             if (property.Parent.ContainsKey(property.Name) && property.Parent[property.Name] != null)
             {
                 property.Parent[property.Name] = null;

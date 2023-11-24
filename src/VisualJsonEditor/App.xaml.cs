@@ -9,12 +9,14 @@
 using System;
 using System.Windows;
 using System.Windows.Forms;
+
 using Microsoft.ApplicationInsights;
+
 using MyToolkit.Composition;
 using MyToolkit.Messaging;
 using MyToolkit.Mvvm;
-using MyToolkit.Storage;
 using MyToolkit.UI;
+
 using VisualJsonEditor.Localization;
 using VisualJsonEditor.Messages;
 
@@ -72,33 +74,41 @@ namespace VisualJsonEditor
 
         private void SaveJsonDocument(SaveJsonDocumentMessage msg)
         {
-            var dlg = new SaveFileDialog();
-            dlg.FileName = msg.FileName;
-            dlg.Filter = Strings.FileDialogFilter;
-            dlg.RestoreDirectory = true;
-            dlg.AddExtension = true;
+            SaveFileDialog dlg = new SaveFileDialog
+            {
+                FileName = msg.FileName,
+                Filter = Strings.FileDialogFilter,
+                RestoreDirectory = true,
+                AddExtension = true
+            };
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 msg.CallSuccessCallback(dlg.FileName);
                 Telemetry.TrackEvent("FileSave");
             }
             else
+            {
                 msg.CallFailCallback(null);
+            }
         }
 
         private void OpenJsonDocument(OpenJsonDocumentMessage msg)
         {
-            var dlg = new OpenFileDialog();
-            dlg.Title = msg.Title;
-            dlg.Filter = Strings.FileDialogFilter; 
-            dlg.RestoreDirectory = true;
+            OpenFileDialog dlg = new OpenFileDialog
+            {
+                Title = msg.Title,
+                Filter = Strings.FileDialogFilter,
+                RestoreDirectory = true
+            };
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 msg.CallSuccessCallback(dlg.FileName);
                 Telemetry.TrackEvent("FileOpen");
             }
             else
+            {
                 msg.CallFailCallback(null);
+            }
         }
     }
 }

@@ -9,11 +9,11 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+
 using MyToolkit.Command;
 using MyToolkit.Composition;
 using MyToolkit.Data;
@@ -21,6 +21,7 @@ using MyToolkit.Dialogs;
 using MyToolkit.Messaging;
 using MyToolkit.Model;
 using MyToolkit.Mvvm;
+
 using VisualJsonEditor.Localization;
 using VisualJsonEditor.Messages;
 using VisualJsonEditor.Models;
@@ -49,16 +50,13 @@ namespace VisualJsonEditor.ViewModels
             RedoCommand = new RelayCommand<JsonDocumentModel>(d => d.UndoRedoManager.Redo(), d => d != null && d.UndoRedoManager.CanRedo);
         }
 
-        public Strings Strings
-        {
-            get { return new Strings(); }
-        }
+        public Strings Strings => new Strings();
 
         /// <summary>Gets or sets the application configuration. </summary>
         public ApplicationConfiguration Configuration
         {
-            get { return _configuration; }
-            set { Set(ref _configuration, value); }
+            get => _configuration;
+            set => Set(ref _configuration, value);
         }
 
         /// <summary>Gets the command to open a document from a file path. </summary>
@@ -97,7 +95,7 @@ namespace VisualJsonEditor.ViewModels
         /// <summary>Gets or sets the currently selected document. </summary>
         public JsonDocumentModel SelectedDocument
         {
-            get { return _selectedDocument; }
+            get => _selectedDocument;
             set
             {
                 if (Set(ref _selectedDocument, value))
@@ -122,15 +120,19 @@ namespace VisualJsonEditor.ViewModels
         {
             if (document.UndoRedoManager.CanUndo)
             {
-                var message = new TextMessage(string.Format(Strings.MessageSaveDocumentText, document.DisplayTitle),
+                TextMessage message = new TextMessage(string.Format(Strings.MessageSaveDocumentText, document.DisplayTitle),
                     Strings.MessageSaveDocumentTitle, MessageButton.YesNoCancel);
 
-                var result = await Messenger.Default.SendAsync(message);
+                CallbackMessageResult<MessageResult> result = await Messenger.Default.SendAsync(message);
                 if (result.Result == MessageResult.Cancel)
+                {
                     return false;
+                }
 
                 if (result.Result == MessageResult.Yes)
+                {
                     await SaveDocumentAsync(document);
+                }
             }
 
             RemoveDocument(document);
@@ -144,7 +146,7 @@ namespace VisualJsonEditor.ViewModels
         {
             await RunTaskAsync(async token =>
             {
-                var document = await JsonDocumentModel.CreateAsync(schemaPath, ServiceLocator.Default.Resolve<IDispatcher>());
+                JsonDocumentModel document = await JsonDocumentModel.CreateAsync(schemaPath, ServiceLocator.Default.Resolve<IDispatcher>());
                 AddDocument(document);
             });
         }
@@ -153,9 +155,11 @@ namespace VisualJsonEditor.ViewModels
         /// <returns>The task. </returns>
         public async Task OpenDocumentAsync()
         {
-            var result = await Messenger.Default.SendAsync(new OpenJsonDocumentMessage(Strings.OpenJsonDocumentDialog));
+            CallbackMessageResult<string> result = await Messenger.Default.SendAsync(new OpenJsonDocumentMessage(Strings.OpenJsonDocumentDialog));
             if (result.Success)
+            {
                 await OpenDocumentAsync(result.Result);
+            }
         }
 
         /// <summary>Opens a document from a given file name. </summary>
@@ -163,7 +167,7 @@ namespace VisualJsonEditor.ViewModels
         /// <returns>The task. </returns>
         public async Task OpenDocumentAsync(string fileName)
         {
-            var isReadOnly = await RunTaskAsync(() => File.GetAttributes(fileName).HasFlag(FileAttributes.ReadOnly));
+            bool isReadOnly = await RunTaskAsync(() => File.GetAttributes(fileName).HasFlag(FileAttributes.ReadOnly));
             await OpenDocumentAsync(fileName, isReadOnly);
         }
 
@@ -173,9 +177,11 @@ namespace VisualJsonEditor.ViewModels
         /// <returns>The task. </returns>
         public async Task OpenDocumentAsync(string fileName, bool isReadOnly)
         {
-            var existingDocument = Documents.SingleOrDefault(d => d.FilePath == fileName);
+            JsonDocumentModel existingDocument = Documents.SingleOrDefault(d => d.FilePath == fileName);
             if (existingDocument != null)
+            {
                 SelectedDocument = existingDocument;
+            }
             else
             {
                 await RunTaskAsync(async token =>
@@ -183,24 +189,30 @@ namespace VisualJsonEditor.ViewModels
                     JsonDocumentModel document = null;
 
                     // First try to load the schema from the default location 
-                    var defaultSchemaPath = JsonDocumentModel.GetDefaultSchemaPath(fileName);
+                    string defaultSchemaPath = JsonDocumentModel.GetDefaultSchemaPath(fileName);
                     if (File.Exists(defaultSchemaPath))
+                    {
                         document = await JsonDocumentModel.LoadAsync(fileName, defaultSchemaPath, ServiceLocator.Default.Resolve<IDispatcher>());
-                    
+                    }
+
                     // If no schema was found, check for a "_schema" property on the document
                     if (document == null)
                     {
-                        var schemaPropertyPath = JsonObjectModel.GetSchemaProperty(fileName);
-                        if (!String.IsNullOrWhiteSpace(schemaPropertyPath) && File.Exists(schemaPropertyPath))
+                        string schemaPropertyPath = JsonObjectModel.GetSchemaProperty(fileName);
+                        if (!string.IsNullOrWhiteSpace(schemaPropertyPath) && File.Exists(schemaPropertyPath))
+                        {
                             document = await JsonDocumentModel.LoadAsync(fileName, schemaPropertyPath, ServiceLocator.Default.Resolve<IDispatcher>());
+                        }
                     }
 
                     // If no default schema or no schema property, prompt.
-                    if(document == null)
+                    if (document == null)
                     {
-                        var result = await Messenger.Default.SendAsync(new OpenJsonDocumentMessage(Strings.OpenJsonSchemaDocumentDialog));
+                        CallbackMessageResult<string> result = await Messenger.Default.SendAsync(new OpenJsonDocumentMessage(Strings.OpenJsonSchemaDocumentDialog));
                         if (!result.Success)
+                        {
                             return;
+                        }
 
                         document = await JsonDocumentModel.LoadAsync(fileName, result.Result, ServiceLocator.Default.Resolve<IDispatcher>());
                     }
@@ -222,9 +234,11 @@ namespace VisualJsonEditor.ViewModels
 
         private async Task CreateDocumentAsync()
         {
-            var result = await Messenger.Default.SendAsync(new OpenJsonDocumentMessage(Strings.OpenJsonSchemaDocumentDialog));
+            CallbackMessageResult<string> result = await Messenger.Default.SendAsync(new OpenJsonDocumentMessage(Strings.OpenJsonSchemaDocumentDialog));
             if (result.Success)
+            {
                 await CreateDocumentAsync(result.Result);
+            }
         }
 
         private void AddDocument(JsonDocumentModel document)
@@ -244,7 +258,7 @@ namespace VisualJsonEditor.ViewModels
 
         private async Task ValidateDocumentAsync(JsonDocumentModel document)
         {
-            var errors = await document.Data.ValidateAsync();
+            string errors = await document.Data.ValidateAsync();
             if (errors.Length == 0)
             {
                 await Messenger.Default.SendAsync(
@@ -271,18 +285,24 @@ namespace VisualJsonEditor.ViewModels
             }
 
             if (args.IsProperty<UndoRedoManager>(i => i.CanRedo))
+            {
                 RedoCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private void AddRecentFile(string fileName)
         {
-            foreach (var entry in Configuration.RecentFiles.Where(f => f.FilePath == fileName).ToArray())
+            foreach (RecentFile entry in Configuration.RecentFiles.Where(f => f.FilePath == fileName).ToArray())
+            {
                 Configuration.RecentFiles.Remove(entry);
+            }
 
             Configuration.RecentFiles.Insert(0, new RecentFile { FilePath = fileName });
 
             if (Configuration.RecentFiles.Count > 10)
+            {
                 Configuration.RecentFiles.Remove(Configuration.RecentFiles.Last());
+            }
         }
 
         private Task SaveDocumentAsync(JsonDocumentModel document)
@@ -299,18 +319,20 @@ namespace VisualJsonEditor.ViewModels
         {
             if (!document.HasFileLocation || saveAs)
             {
-                var fileName = document.HasFileLocation ?
+                string fileName = document.HasFileLocation ?
                     Path.GetFileNameWithoutExtension(document.FilePath) + ".json" :
                     Strings.DefaultFileName + ".json";
 
-                var result = await Messenger.Default.SendAsync(new SaveJsonDocumentMessage(fileName));
+                CallbackMessageResult<string> result = await Messenger.Default.SendAsync(new SaveJsonDocumentMessage(fileName));
                 if (result.Success)
                 {
                     AddRecentFile(result.Result);
                     document.FilePath = result.Result;
                 }
                 else
+                {
                     return;
+                }
             }
 
             await RunTaskAsync(async token =>
@@ -321,8 +343,8 @@ namespace VisualJsonEditor.ViewModels
 
         private async Task SaveDocumentSchemaAsAsync(JsonDocumentModel document)
         {
-            var fileName = Path.GetFileNameWithoutExtension(document.FilePath) + ".schema.json";
-            var result = await Messenger.Default.SendAsync(new SaveJsonDocumentMessage(fileName));
+            string fileName = Path.GetFileNameWithoutExtension(document.FilePath) + ".schema.json";
+            CallbackMessageResult<string> result = await Messenger.Default.SendAsync(new SaveJsonDocumentMessage(fileName));
             if (result.Success)
             {
                 await RunTaskAsync(async token =>

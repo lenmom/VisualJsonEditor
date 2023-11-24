@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Documents;
+
 using MyToolkit.Utilities;
 
 namespace VisualJsonEditor.Views
@@ -19,13 +20,13 @@ namespace VisualJsonEditor.Views
     {
         public AboutWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();
             Version.Text = "v" + Assembly.GetExecutingAssembly().GetVersionWithBuildTime();
         }
 
         private void OnOpenHyperlink(object sender, RoutedEventArgs e)
         {
-            var uri = ((Hyperlink)sender).NavigateUri;
+            System.Uri uri = ((Hyperlink)sender).NavigateUri;
             Process.Start(uri.ToString());
         }
 

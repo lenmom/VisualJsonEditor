@@ -10,8 +10,10 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+
 using NJsonSchema;
 
 namespace VisualJsonEditor.Utilities
@@ -31,14 +33,18 @@ namespace VisualJsonEditor.Utilities
         /// <exception cref="IOException">An I/O error occurred while opening the file. </exception>
         public static T Load<T>(string fileNameWithoutExtension, bool alwaysCreateNewSchemaFile, bool storeInAppData) where T : new()
         {
-            var configPath = CreateFilePath(fileNameWithoutExtension, ConfigExtension, storeInAppData);
-            var schemaPath = CreateFilePath(fileNameWithoutExtension, SchemaExtension, storeInAppData);
+            string configPath = CreateFilePath(fileNameWithoutExtension, ConfigExtension, storeInAppData);
+            string schemaPath = CreateFilePath(fileNameWithoutExtension, SchemaExtension, storeInAppData);
 
             if (alwaysCreateNewSchemaFile || !File.Exists(schemaPath))
+            {
                 CreateSchemaFile<T>(fileNameWithoutExtension, storeInAppData);
+            }
 
             if (!File.Exists(configPath))
+            {
                 return CreateDefaultConfigurationFile<T>(fileNameWithoutExtension, storeInAppData);
+            }
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(configPath, Encoding.UTF8));
         }
@@ -52,10 +58,10 @@ namespace VisualJsonEditor.Utilities
         {
             CreateSchemaFile<T>(fileNameWithoutExtension, storeInAppData);
 
-            var settings = new JsonSerializerSettings();
+            JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.Converters.Add(new StringEnumConverter());
 
-            var configPath = CreateFilePath(fileNameWithoutExtension, ConfigExtension, storeInAppData);
+            string configPath = CreateFilePath(fileNameWithoutExtension, ConfigExtension, storeInAppData);
             File.WriteAllText(configPath, JsonConvert.SerializeObject(configuration, Formatting.Indented, settings), Encoding.UTF8);
         }
 
@@ -63,12 +69,14 @@ namespace VisualJsonEditor.Utilities
         {
             if (storeInAppData)
             {
-                var appDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                var filePath = Path.Combine(appDataDirectory, fileNameWithoutExtension) + extension;
+                string appDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string filePath = Path.Combine(appDataDirectory, fileNameWithoutExtension) + extension;
 
-                var directoryPath = Path.GetDirectoryName(filePath);
+                string directoryPath = Path.GetDirectoryName(filePath);
                 if (directoryPath != null && !Directory.Exists(directoryPath))
+                {
                     Directory.CreateDirectory(directoryPath);
+                }
 
                 return filePath;
             }
@@ -77,9 +85,9 @@ namespace VisualJsonEditor.Utilities
 
         private static T CreateDefaultConfigurationFile<T>(string fileNameWithoutExtension, bool storeInAppData) where T : new()
         {
-            var config = new T();
-            var configData = JsonConvert.SerializeObject(config, Formatting.Indented);
-            var configPath = CreateFilePath(fileNameWithoutExtension, ConfigExtension, storeInAppData);
+            T config = new T();
+            string configData = JsonConvert.SerializeObject(config, Formatting.Indented);
+            string configPath = CreateFilePath(fileNameWithoutExtension, ConfigExtension, storeInAppData);
 
             File.WriteAllText(configPath, configData, Encoding.UTF8);
             return config;
@@ -87,8 +95,8 @@ namespace VisualJsonEditor.Utilities
 
         private static void CreateSchemaFile<T>(string fileNameWithoutExtension, bool storeInAppData) where T : new()
         {
-            var schemaPath = CreateFilePath(fileNameWithoutExtension, SchemaExtension, storeInAppData);
-            var schema = Task.Run(() => JsonSchema.FromType<T>()).GetAwaiter().GetResult();
+            string schemaPath = CreateFilePath(fileNameWithoutExtension, SchemaExtension, storeInAppData);
+            JsonSchema schema = Task.Run(() => JsonSchema.FromType<T>()).GetAwaiter().GetResult();
 
             File.WriteAllText(schemaPath, schema.ToJson(), Encoding.UTF8);
         }

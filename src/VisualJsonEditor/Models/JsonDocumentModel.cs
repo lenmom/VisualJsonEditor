@@ -9,9 +9,11 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+
 using MyToolkit.Data;
 using MyToolkit.Model;
 using MyToolkit.Mvvm;
+
 using NJsonSchema;
 
 namespace VisualJsonEditor.Models
@@ -29,7 +31,7 @@ namespace VisualJsonEditor.Models
         /// <summary>Gets or sets the document's file path. </summary>
         public string FilePath
         {
-            get { return _filePath; }
+            get => _filePath;
             set
             {
                 if (Set(ref _filePath, value))
@@ -49,22 +51,22 @@ namespace VisualJsonEditor.Models
             get
             {
                 if (HasFileLocation)
+                {
                     return Path.GetFileName(FilePath);
+                }
+
                 return "Unsaved";
             }
         }
 
         /// <summary>Gets a value indicating whether the document has a file location. </summary>
-        public bool HasFileLocation
-        {
-            get { return _filePath != null; }
-        }
+        public bool HasFileLocation => _filePath != null;
 
         /// <summary>Gets the JSON data. </summary>
         public JsonObjectModel Data
         {
-            get { return _data; }
-            private set { Set(ref _data, value); }
+            get => _data;
+            private set => Set(ref _data, value);
         }
 
         /// <summary>Gets or sets the undo/redo manager. </summary>
@@ -73,8 +75,8 @@ namespace VisualJsonEditor.Models
         /// <summary>Gets a value indicating whether the document is read only. </summary>
         public bool IsReadOnly
         {
-            get { return _isReadOnly; }
-            set { Set(ref _isReadOnly, value); }
+            get => _isReadOnly;
+            set => Set(ref _isReadOnly, value);
         }
 
         /// <summary>Initializes the document. </summary>
@@ -91,9 +93,12 @@ namespace VisualJsonEditor.Models
         /// <returns>The path to the schema file. </returns>
         public static string GetDefaultSchemaPath(string filePath)
         {
-            var directoryName = Path.GetDirectoryName(filePath);
+            string directoryName = Path.GetDirectoryName(filePath);
             if (string.IsNullOrEmpty(directoryName))
+            {
                 return Path.GetFileNameWithoutExtension(filePath) + ".schema" + Path.GetExtension(filePath);
+            }
+
             return Path.Combine(directoryName, Path.GetFileNameWithoutExtension(filePath) + ".schema" + Path.GetExtension(filePath));
         }
 
@@ -103,7 +108,7 @@ namespace VisualJsonEditor.Models
         /// <returns>The <see cref="JsonDocumentModel"/>. </returns>
         public static Task<JsonDocumentModel> LoadAsync(string filePath, IDispatcher dispatcher)
         {
-            var schemaPath = GetDefaultSchemaPath(filePath);
+            string schemaPath = GetDefaultSchemaPath(filePath);
             return LoadAsync(filePath, schemaPath, dispatcher);
         }
 
@@ -116,10 +121,10 @@ namespace VisualJsonEditor.Models
         {
             return Task.Run(() =>
             {
-                var schema = JsonSchema.FromFileAsync(schemaPath).GetAwaiter().GetResult();
-                var data = JsonObjectModel.FromJson(File.ReadAllText(filePath, Encoding.UTF8), schema); 
+                JsonSchema schema = JsonSchema.FromFileAsync(schemaPath).GetAwaiter().GetResult();
+                JsonObjectModel data = JsonObjectModel.FromJson(File.ReadAllText(filePath, Encoding.UTF8), schema);
 
-                var document = new JsonDocumentModel();
+                JsonDocumentModel document = new JsonDocumentModel();
                 document.Initialize(data, dispatcher);
                 document.FilePath = filePath;
                 document.SchemaPath = schemaPath;
@@ -135,10 +140,10 @@ namespace VisualJsonEditor.Models
         {
             return Task.Run(() =>
             {
-                var schema = JsonSchema.FromFileAsync(schemaPath).GetAwaiter().GetResult();
-                var data = JsonObjectModel.FromSchema(schema);
+                JsonSchema schema = JsonSchema.FromFileAsync(schemaPath).GetAwaiter().GetResult();
+                JsonObjectModel data = JsonObjectModel.FromSchema(schema);
 
-                var document = new JsonDocumentModel();
+                JsonDocumentModel document = new JsonDocumentModel();
                 document.Initialize(data, dispatcher);
                 return document;
             });
@@ -151,16 +156,18 @@ namespace VisualJsonEditor.Models
         public async Task SaveAsync(bool saveSchema)
         {
             if (!HasFileLocation)
+            {
                 throw new IOException("The document has no file location");
+            }
 
             await Task.Run(() =>
             {
-                var jsonData = Data.ToJson();
+                string jsonData = Data.ToJson();
                 File.WriteAllText(FilePath, jsonData, Encoding.UTF8);
 
                 if (saveSchema)
                 {
-                    var schemaPath = GetDefaultSchemaPath(FilePath);
+                    string schemaPath = GetDefaultSchemaPath(FilePath);
                     File.WriteAllText(schemaPath, Data.Schema.ToJson());
                 }
             });
@@ -173,7 +180,10 @@ namespace VisualJsonEditor.Models
         public override string ToString()
         {
             if (HasFileLocation)
+            {
                 return Path.GetFileName(FilePath);
+            }
+
             return "Unsaved";
         }
     }

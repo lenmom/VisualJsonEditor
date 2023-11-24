@@ -17,7 +17,7 @@ namespace VisualJsonEditor.Messages
         /// <param name="title">The title to show in the dialog. </param>
         public OpenJsonDocumentMessage(string title)
         {
-            Title = title; 
+            Title = title;
         }
 
         /// <summary>Gets or sets the file name. </summary>

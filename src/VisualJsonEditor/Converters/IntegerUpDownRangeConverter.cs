@@ -17,12 +17,19 @@ namespace VisualJsonEditor.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
+            {
                 return parameter.ToString() == "min" ? int.MinValue : int.MaxValue;
+            }
 
             if (value is decimal)
+            {
                 return (int)(decimal)value;
+            }
+
             if (value is double)
+            {
                 return (int)(double)value;
+            }
 
             return (int)value;
         }
